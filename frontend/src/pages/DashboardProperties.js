@@ -1,36 +1,56 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchProperties } from "../store/propertySlice";
 import axios from "axios";
+import {
+  Table, TableBody, TableCell, TableContainer, TableHead, TableRow,
+  Paper, IconButton, Typography, Box
+} from "@mui/material";
+import { Delete, Edit } from "@mui/icons-material";
 
 export default function DashboardProperties() {
-  const [items, setItems] = useState([]);
+  const dispatch = useDispatch();
+  const { items } = useSelector((s) => s.properties);
 
-  const load = async () => {
-    const res = await axios.get("/api/properties?limit=100");
-    setItems(res.data.data);
-  };
+  useEffect(() => {
+    dispatch(fetchProperties({ page: 1 }));
+  }, [dispatch]);
 
-  useEffect(() => { load(); }, []);
-
-  const archive = async (id) => {
-    await axios.patch(`/api/properties/${id}/archive`);
-    load();
-  };
-
-  const remove = async (id) => {
+  const handleDelete = async (id) => {
     await axios.delete(`/api/properties/${id}`);
-    load();
+    dispatch(fetchProperties({ page: 1 }));
   };
 
   return (
-    <div>
-      <h2>Manage Properties</h2>
-      {items.map(p => (
-        <div key={p._id} style={{ borderBottom: "1px solid #ddd", padding: 8 }}>
-          <strong>{p.title}</strong> — {p.status}
-          <button onClick={() => archive(p._id)} style={{ marginLeft: 10 }}>Archive</button>
-          <button onClick={() => remove(p._id)} style={{ marginLeft: 10 }}>Delete</button>
-        </div>
-      ))}
-    </div>
+    <Box>
+      <Typography variant="h6" gutterBottom>Manage Properties</Typography>
+      <TableContainer component={Paper}>
+        <Table>
+          <TableHead>
+            <TableRow>
+              <TableCell>Title</TableCell>
+              <TableCell>Location</TableCell>
+              <TableCell>Price</TableCell>
+              <TableCell>Type</TableCell>
+              <TableCell align="right">Actions</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {items.map((p) => (
+              <TableRow key={p._id}>
+                <TableCell>{p.title}</TableCell>
+                <TableCell>{p.location}</TableCell>
+                <TableCell>${p.price}</TableCell>
+                <TableCell>{p.type}</TableCell>
+                <TableCell align="right">
+                  <IconButton color="primary"><Edit /></IconButton>
+                  <IconButton color="error" onClick={() => handleDelete(p._id)}><Delete /></IconButton>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
+    </Box>
   );
 }

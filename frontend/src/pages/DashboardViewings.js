@@ -1,50 +1,59 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
+import {
+  Table, TableBody, TableCell, TableContainer, TableHead, TableRow,
+  Paper, IconButton, Typography, Box, Chip
+} from "@mui/material";
+import { CheckCircle, Cancel } from "@mui/icons-material";
 
 export default function DashboardViewings() {
   const [viewings, setViewings] = useState([]);
-  const [form, setForm] = useState({ property: "", client: "", scheduledAt: "" });
 
-  const load = () => {
-    axios.get("/api/viewings").then(r => setViewings(r.data));
-  };
-
-  useEffect(() => { load(); }, []);
-
-  const create = async (e) => {
-    e.preventDefault();
-    await axios.post("/api/viewings", form);
-    setForm({ property: "", client: "", scheduledAt: "" });
-    load();
-  };
+  useEffect(() => {
+    axios.get("/api/viewings").then((res) => setViewings(res.data));
+  }, []);
 
   const updateStatus = async (id, status) => {
-    await axios.patch(`/api/viewings/${id}/status`, { status });
-    load();
+    await axios.put(`/api/viewings/${id}`, { status });
+    const res = await axios.get("/api/viewings");
+    setViewings(res.data);
   };
 
   return (
-    <div>
-      <h2>Viewings</h2>
-
-      <form onSubmit={create} style={{ display: "grid", gap: 8, maxWidth: 400 }}>
-        <input placeholder="Property ID" value={form.property} onChange={e => setForm(f => ({...f, property:e.target.value}))} required />
-        <input placeholder="Client ID" value={form.client} onChange={e => setForm(f => ({...f, client:e.target.value}))} required />
-        <input type="datetime-local" value={form.scheduledAt} onChange={e => setForm(f => ({...f, scheduledAt:e.target.value}))} required />
-        <button type="submit">Schedule Viewing</button>
-      </form>
-
-      <div style={{ marginTop: 20 }}>
-        {viewings.map(v => (
-          <div key={v._id} style={{ borderBottom: "1px solid #ddd", padding: 8 }}>
-            <p>
-              {v.property?.title} with {v.client?.name} — {new Date(v.scheduledAt).toLocaleString()} — Status: {v.status}
-            </p>
-            <button onClick={() => updateStatus(v._id, "completed")}>Mark Completed</button>
-            <button onClick={() => updateStatus(v._id, "no-show")}>Mark No-Show</button>
-          </div>
-        ))}
-      </div>
-    </div>
+    <Box>
+      <Typography variant="h6" gutterBottom>Scheduled Viewings</Typography>
+      <TableContainer component={Paper}>
+        <Table>
+          <TableHead>
+            <TableRow>
+              <TableCell>Client</TableCell>
+              <TableCell>Property</TableCell>
+              <TableCell>Date</TableCell>
+              <TableCell>Status</TableCell>
+              <TableCell align="right">Actions</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {viewings.map((v) => (
+              <TableRow key={v._id}>
+                <TableCell>{v.client?.name}</TableCell>
+                <TableCell>{v.property?.title}</TableCell>
+                <TableCell>{new Date(v.date).toLocaleDateString()}</TableCell>
+                <TableCell>
+                  <Chip
+                    label={v.status}
+                    color={v.status === "confirmed" ? "success" : "warning"}
+                  />
+                </TableCell>
+                <TableCell align="right">
+                  <IconButton color="success" onClick={() => updateStatus(v._id, "confirmed")}><CheckCircle /></IconButton>
+                  <IconButton color="error" onClick={() => updateStatus(v._id, "cancelled")}><Cancel /></IconButton>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
+    </Box>
   );
 }
