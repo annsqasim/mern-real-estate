@@ -113,3 +113,44 @@ export const createProperty = async (req, res) => {
     res.status(400).json({ message: err.message });
   }
 };
+
+// UPDATE property
+export const updateProperty = async (req, res) => {
+  try {
+    const property = await Property.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      { new: true }
+    );
+    if (!property) return res.status(404).json({ message: "Not found" });
+    res.json(property);
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
+};
+
+// DELETE property
+export const deleteProperty = async (req, res) => {
+  try {
+    const property = await Property.findByIdAndDelete(req.params.id);
+    if (!property) return res.status(404).json({ message: "Not found" });
+    res.json({ message: "Deleted successfully" });
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
+};
+
+// HIDE property
+export const archiveProperty = async (req, res) => {
+  try {
+    const property = await Property.findByIdAndUpdate(
+      req.params.id,
+      { status: "archived" },
+      { new: true }
+    );
+    if (!property) return res.status(404).json({ message: "Not found" });
+    res.json(property);
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
+};
