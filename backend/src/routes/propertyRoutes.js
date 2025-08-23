@@ -1,10 +1,10 @@
 import express from "express";
-import { getProperties, createProperty } from "../../controllers/propertyController.js";
+import { getProperties, createProperty, getPropertyById } from "../../controllers/propertyController.js";
 
 const router = express.Router();
 
 router.get("/", getProperties);
+router.get("/:id", getPropertyById);
 router.post("/", createProperty);
 
-// 👇 IMPORTANT: must be a default export
 export default router;
