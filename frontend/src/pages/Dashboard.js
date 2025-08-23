@@ -14,17 +14,17 @@ export default function Dashboard() {
       >
         <Toolbar />
         <Box sx={{ overflow: "auto" }}>
-          <List>
-            <ListItemButton component={Link} to="properties">
-              <ListItemText primary="Properties" />
-            </ListItemButton>
-            <ListItemButton component={Link} to="clients">
-              <ListItemText primary="Clients" />
-            </ListItemButton>
-            <ListItemButton component={Link} to="viewings">
-              <ListItemText primary="Viewings" />
-            </ListItemButton>
-          </List>
+        <List>
+            <ListItemButton component={Link} to="/dashboard/properties">
+            <ListItemText primary="Properties" />
+        </ListItemButton>
+            <ListItemButton component={Link} to="/dashboard/clients">
+            <ListItemText primary="Clients" />
+        </ListItemButton>
+            <ListItemButton component={Link} to="/dashboard/viewings">
+            <ListItemText primary="Viewings" />
+        </ListItemButton>
+        </List>
         </Box>
       </Drawer>
 

@@ -1,13 +1,17 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 
-// fetch with query object → { page, limit, type, location, q, priceMin, ... }
 export const fetchProperties = createAsyncThunk(
-  "properties/fetchAll",
-  async (params = {}) => {
-    const search = new URLSearchParams(params).toString();
-    const res = await axios.get(`/api/properties${search ? `?${search}` : ""}`);
-    return res.data; // { data, page, limit, total, totalPages }
+  "properties/fetch",
+  async ({ page = 1, limit = 6, type, location, minPrice, maxPrice }) => {
+    const params = new URLSearchParams({ page, limit });
+    if (type) params.append("type", type);
+    if (location) params.append("location", location);
+    if (minPrice) params.append("minPrice", minPrice);
+    if (maxPrice) params.append("maxPrice", maxPrice);
+
+    const res = await axios.get(`/api/properties?${params.toString()}`);
+    return res.data;
   }
 );
 
