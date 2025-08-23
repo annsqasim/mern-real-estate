@@ -1,0 +1,42 @@
+# Node modules
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Logs
+logs
+*.log
+logs/*.log
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Build output
+dist/
+build/
+
+# Coverage
+coverage/
+*.lcov
+
+# macOS
+.DS_Store
+
+# VSCode
+.vscode/
+.idea/
+
+# Frontend (React) specific
+frontend/node_modules/
+frontend/build/
+
+# Backend specific
+backend/node_modules/
+backend/dist/
+
+# Optional: If you generate data locally
+backend/data/
