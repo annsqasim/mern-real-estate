@@ -2,7 +2,9 @@ import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
 import connectDB from "../config/db.js";
+
 import propertyRoutes from "./routes/propertyRoutes.js";
+import clientRoutes from "./routes/clientRoutes.js";
 
 dotenv.config();
 connectDB();
@@ -12,8 +14,8 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// 👇 add a startup log
 app.use("/api/properties", propertyRoutes);
+app.use("/api/clients", clientRoutes);
 
 app.get("/api/test", (req, res) => {
     res.json({ message: "test route works" });
