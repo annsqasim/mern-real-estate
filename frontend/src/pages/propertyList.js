@@ -1,85 +1,86 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchProperties, setQuery } from "../store/propertySlice";
+import { fetchProperties } from "../store/propertySlice";
+import { Link } from "react-router-dom";
+import {
+  Grid,
+  Card,
+  CardContent,
+  CardMedia,
+  Typography,
+  Button,
+  Box,
+  Pagination
+} from "@mui/material";
 
 export default function PropertyList() {
   const dispatch = useDispatch();
-  const { items, loading, error, page, totalPages, total, lastQuery } = useSelector(s => s.properties);
+  const { items, status, page, totalPages } = useSelector((s) => s.properties);
 
-  // simple filter UI state
-  const [filters, setFilters] = useState({
-    q: "",
-    type: "",
-    location: "",
-    priceMin: "",
-    priceMax: "",
-    bedMin: "",
-    bathMin: "",
-    limit: 8
-  });
-
-  // load on mount
   useEffect(() => {
-    dispatch(fetchProperties({ page: 1, limit: filters.limit }));
-  }, [dispatch]); // first load
+    dispatch(fetchProperties({ page: 1 }));
+  }, [dispatch]);
 
-  const applyFilters = () => {
-    const query = Object.fromEntries(Object.entries(filters).filter(([_, v]) => v !== "" && v != null));
-    dispatch(setQuery(query));
-    dispatch(fetchProperties({ ...query, page: 1 }));
+  const handlePageChange = (event, value) => {
+    dispatch(fetchProperties({ page: value }));
   };
 
-  const goToPage = (p) => {
-    dispatch(fetchProperties({ ...lastQuery, page: p }));
-  };
+  if (status === "loading") return <p>Loading...</p>;
+  if (status === "failed") return <p>Error fetching properties.</p>;
 
   return (
-    <div style={{ padding: 20 }}>
-      <h1>Properties</h1>
+    <Box sx={{ flexGrow: 1, p: 3 }}>
+      <Typography variant="h4" gutterBottom>
+        Available Properties
+      </Typography>
 
-      {/* Filters */}
-      <div style={{ display: "grid", gap: 8, gridTemplateColumns: "repeat(6, minmax(0, 1fr))", marginBottom: 12 }}>
-        <input placeholder="Search (q)" value={filters.q} onChange={e => setFilters(f => ({...f, q:e.target.value}))}/>
-        <select value={filters.type} onChange={e => setFilters(f => ({...f, type:e.target.value}))}>
-          <option value="">Any Type</option>
-          <option value="rent">Rent</option>
-          <option value="sale">Sale</option>
-        </select>
-        <input placeholder="Location" value={filters.location} onChange={e => setFilters(f => ({...f, location:e.target.value}))}/>
-        <input placeholder="Min Price" type="number" value={filters.priceMin} onChange={e => setFilters(f => ({...f, priceMin:e.target.value}))}/>
-        <input placeholder="Max Price" type="number" value={filters.priceMax} onChange={e => setFilters(f => ({...f, priceMax:e.target.value}))}/>
-        <input placeholder="Min Beds" type="number" value={filters.bedMin} onChange={e => setFilters(f => ({...f, bedMin:e.target.value}))}/>
-      </div>
-      <button onClick={applyFilters}>Apply Filters</button>
+      <Grid container spacing={3}>
+        {items.map((p) => (
+          <Grid item xs={12} sm={6} md={4} key={p._id}>
+            <Card sx={{ maxWidth: 345, height: "100%", display: "flex", flexDirection: "column" }}>
+              {p.images?.[0] && (
+                <CardMedia
+                  component="img"
+                  height="180"
+                  image={p.images[0]}
+                  alt={p.title}
+                />
+              )}
+              <CardContent sx={{ flexGrow: 1 }}>
+                <Typography gutterBottom variant="h6" component="div">
+                  {p.title}
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  {p.location}
+                </Typography>
+                <Typography variant="body2" color="primary">
+                  ${p.price} • {p.type}
+                </Typography>
+              </CardContent>
+              <Box sx={{ p: 2 }}>
+                <Button
+                  component={Link}
+                  to={`/property/${p._id}`}
+                  variant="contained"
+                  fullWidth
+                >
+                  View Details
+                </Button>
+              </Box>
+            </Card>
+          </Grid>
+        ))}
+      </Grid>
 
-      <div style={{ marginTop: 16 }}>
-        {loading && <p>Loading…</p>}
-        {error && <p style={{ color: "red" }}>{error}</p>}
-        {!loading && !error && (
-          <>
-            <p>{total} results</p>
-            {items.map(p => (
-              <div key={p._id} style={{ border: "1px solid #eee", padding: 12, marginBottom: 8 }}>
-                <h3>{p.title}</h3>
-                <p>{p.location} — ${p.price} — {p.type}</p>
-                <a href={`/property/${p._id}`}>View details</a>
-              </div>
-            ))}
-
-            {/* Pagination */}
-            <div style={{ marginTop: 12 }}>
-              {Array.from({ length: totalPages }, (_, i) => i + 1).map(n => (
-                <button
-                  key={n}
-                  onClick={() => goToPage(n)}
-                  disabled={n === page}
-                  style={{ marginRight: 6 }}
-                >{n}</button>
-              ))}
-            </div>
-          </>
-        )}
-      </div>
-    </div>
+      {/* Pagination */}
+      <Box sx={{ display: "flex", justifyContent: "center", mt: 4 }}>
+        <Pagination
+          count={totalPages}
+          page={page}
+          onChange={handlePageChange}
+          color="primary"
+        />
+      </Box>
+    </Box>
   );
 }

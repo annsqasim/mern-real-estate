@@ -1,111 +1,41 @@
 import { useState } from "react";
-import { useDispatch } from "react-redux";
-import { createProperty } from "../store/propertySlice";
-import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import { Box, TextField, Button, Typography, Paper } from "@mui/material";
 
 export default function CreateProperty() {
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
-
   const [form, setForm] = useState({
     title: "",
+    description: "",
     price: "",
-    type: "rent",
     location: "",
-    bedrooms: "",
-    bathrooms: "",
-    area: "",
-    amenities: "",
+    type: "rent",
     images: ""
   });
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setForm((f) => ({ ...f, [name]: value }));
-  };
+  const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    const payload = {
-      ...form,
-      price: Number(form.price),
-      bedrooms: Number(form.bedrooms),
-      bathrooms: Number(form.bathrooms),
-      area: Number(form.area),
-      amenities: form.amenities ? form.amenities.split(",").map(a => a.trim()) : [],
-      images: form.images ? form.images.split(",").map(i => i.trim()) : []
-    };
-
-    await dispatch(createProperty(payload));
-    navigate("/"); // back to list
+    const payload = { ...form, images: form.images.split(",").map((s) => s.trim()) };
+    await axios.post("/api/properties", payload);
+    alert("Property created!");
+    setForm({ title: "", description: "", price: "", location: "", type: "rent", images: "" });
   };
 
   return (
-    <div style={{ padding: 20 }}>
-      <h1>Create Property</h1>
-      <form onSubmit={handleSubmit} style={{ display: "grid", gap: 12, maxWidth: 500 }}>
-        <input
-          name="title"
-          placeholder="Title"
-          value={form.title}
-          onChange={handleChange}
-          required
-        />
-        <input
-          name="price"
-          type="number"
-          placeholder="Price"
-          value={form.price}
-          onChange={handleChange}
-          required
-        />
-        <select name="type" value={form.type} onChange={handleChange}>
-          <option value="rent">Rent</option>
-          <option value="sale">Sale</option>
-        </select>
-        <input
-          name="location"
-          placeholder="Location"
-          value={form.location}
-          onChange={handleChange}
-          required
-        />
-        <input
-          name="bedrooms"
-          type="number"
-          placeholder="Bedrooms"
-          value={form.bedrooms}
-          onChange={handleChange}
-        />
-        <input
-          name="bathrooms"
-          type="number"
-          placeholder="Bathrooms"
-          value={form.bathrooms}
-          onChange={handleChange}
-        />
-        <input
-          name="area"
-          type="number"
-          placeholder="Area (sqft)"
-          value={form.area}
-          onChange={handleChange}
-        />
-        <input
-          name="amenities"
-          placeholder="Amenities (comma separated)"
-          value={form.amenities}
-          onChange={handleChange}
-        />
-        <input
-          name="images"
-          placeholder="Image URLs (comma separated)"
-          value={form.images}
-          onChange={handleChange}
-        />
-        <button type="submit">Create</button>
-      </form>
-    </div>
+    <Box sx={{ p: 4 }}>
+      <Paper elevation={3} sx={{ p: 3, maxWidth: 600 }}>
+        <Typography variant="h5" gutterBottom>Create New Property</Typography>
+        <form onSubmit={handleSubmit} style={{ display: "grid", gap: 16 }}>
+          <TextField label="Title" name="title" value={form.title} onChange={handleChange} required />
+          <TextField label="Description" name="description" value={form.description} onChange={handleChange} multiline rows={3} />
+          <TextField label="Price" name="price" type="number" value={form.price} onChange={handleChange} required />
+          <TextField label="Location" name="location" value={form.location} onChange={handleChange} required />
+          <TextField label="Type (rent/sale)" name="type" value={form.type} onChange={handleChange} required />
+          <TextField label="Image URLs (comma separated)" name="images" value={form.images} onChange={handleChange} />
+          <Button type="submit" variant="contained">Create</Button>
+        </form>
+      </Paper>
+    </Box>
   );
 }

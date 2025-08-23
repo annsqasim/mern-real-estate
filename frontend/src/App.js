@@ -1,4 +1,5 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+
 import TestPage from "./pages/testpage";
 import PropertyList from "./pages/propertyList";
 import PropertyDetail from "./pages/propertydetail";

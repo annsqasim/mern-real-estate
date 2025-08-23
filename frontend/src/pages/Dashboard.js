@@ -1,25 +1,39 @@
-import { Link, Routes, Route } from "react-router-dom";
-import DashboardProperties from "./DashboardProperties";
-import DashboardClients from "./DashboardClients";
-import DashboardViewings from "./DashboardViewings";
+import { Outlet, Link } from "react-router-dom";
+import { Drawer, List, ListItemButton, ListItemText, Toolbar, Box, Typography } from "@mui/material";
 
 export default function Dashboard() {
   return (
-    <div style={{ display: "flex" }}>
-      <aside style={{ width: 200, padding: 20, background: "#f5f5f5" }}>
-        <nav>
-          <p><Link to="properties">Properties</Link></p>
-          <p><Link to="clients">Clients</Link></p>
-          <p><Link to="viewings">Viewings</Link></p>
-        </nav>
-      </aside>
-      <main style={{ flex: 1, padding: 20 }}>
-        <Routes>
-          <Route path="properties" element={<DashboardProperties />} />
-          <Route path="clients" element={<DashboardClients />} />
-          <Route path="viewings" element={<DashboardViewings />} />
-        </Routes>
-      </main>
-    </div>
+    <Box sx={{ display: "flex" }}>
+      {/* Sidebar */}
+      <Drawer
+        variant="permanent"
+        sx={{
+          width: 240,
+          [`& .MuiDrawer-paper`]: { width: 240, boxSizing: "border-box" }
+        }}
+      >
+        <Toolbar />
+        <Box sx={{ overflow: "auto" }}>
+          <List>
+            <ListItemButton component={Link} to="properties">
+              <ListItemText primary="Properties" />
+            </ListItemButton>
+            <ListItemButton component={Link} to="clients">
+              <ListItemText primary="Clients" />
+            </ListItemButton>
+            <ListItemButton component={Link} to="viewings">
+              <ListItemText primary="Viewings" />
+            </ListItemButton>
+          </List>
+        </Box>
+      </Drawer>
+
+      {/* Main content */}
+      <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
+        <Toolbar />
+        <Typography variant="h5" gutterBottom>Agent Dashboard</Typography>
+        <Outlet />
+      </Box>
+    </Box>
   );
 }

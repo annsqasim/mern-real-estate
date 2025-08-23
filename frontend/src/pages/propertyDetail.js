@@ -1,75 +1,67 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
+import {
+  Box,
+  Typography,
+  Grid,
+  Card,
+  CardMedia,
+  TextField,
+  Button,
+  Paper
+} from "@mui/material";
 
 export default function PropertyDetail() {
   const { id } = useParams();
-  const [data, setData] = useState(null);
-  const [form, setForm] = useState({ name: "", email: "", phone: "", message: "" });
-  const [submitted, setSubmitted] = useState(false);
+  const [property, setProperty] = useState(null);
+  const [form, setForm] = useState({ name: "", email: "", message: "" });
 
   useEffect(() => {
-    axios.get(`/api/properties/${id}`).then(r => setData(r.data));
+    axios.get(`/api/properties/${id}`).then((res) => setProperty(res.data));
   }, [id]);
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setForm((f) => ({ ...f, [name]: value }));
-  };
+  const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    await axios.post("/api/clients", { ...form, property: id });
-    setSubmitted(true);
+    await axios.post("/api/clients", { ...form, propertyId: id });
+    setForm({ name: "", email: "", message: "" });
+    alert("Inquiry submitted!");
   };
 
-  if (!data) return <p>Loading…</p>;
+  if (!property) return <p>Loading...</p>;
 
   return (
-    <div style={{ padding: 20 }}>
-      <h1>{data.title}</h1>
-      <p>{data.location} — ${data.price} — {data.type}</p>
-      <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 20 }}>
-        {(data.images || []).map((src, i) => (
-          <img key={i} src={src} alt="" width="180" height="120" style={{ objectFit: "cover" }} />
-        ))}
-      </div>
+    <Box sx={{ p: 4 }}>
+      <Typography variant="h4" gutterBottom>{property.title}</Typography>
+      <Typography variant="h6" color="text.secondary" gutterBottom>
+        {property.location} — ${property.price}
+      </Typography>
 
-      <h2>Send Inquiry</h2>
-      {submitted ? (
-        <p style={{ color: "green" }}>Thank you! We’ll get back to you soon.</p>
-      ) : (
-        <form onSubmit={handleSubmit} style={{ display: "grid", gap: 8, maxWidth: 400 }}>
-          <input
-            name="name"
-            placeholder="Your Name"
-            value={form.name}
-            onChange={handleChange}
-            required
-          />
-          <input
-            name="email"
-            type="email"
-            placeholder="Email"
-            value={form.email}
-            onChange={handleChange}
-            required
-          />
-          <input
-            name="phone"
-            placeholder="Phone (optional)"
-            value={form.phone}
-            onChange={handleChange}
-          />
-          <textarea
-            name="message"
-            placeholder="Message"
-            value={form.message}
-            onChange={handleChange}
-          />
-          <button type="submit">Submit Inquiry</button>
+      {/* Gallery */}
+      <Grid container spacing={2} sx={{ mb: 4 }}>
+        {property.images?.map((img, i) => (
+          <Grid item xs={12} sm={6} md={4} key={i}>
+            <Card>
+              <CardMedia component="img" height="200" image={img} alt={property.title} />
+            </Card>
+          </Grid>
+        ))}
+      </Grid>
+
+      <Typography variant="body1" sx={{ mb: 4 }}>{property.description}</Typography>
+
+      {/* Inquiry Form */}
+      <Paper elevation={3} sx={{ p: 3, maxWidth: 500 }}>
+        <Typography variant="h6" gutterBottom>Contact Agent</Typography>
+        <form onSubmit={handleSubmit} style={{ display: "grid", gap: 16 }}>
+          <TextField label="Name" name="name" value={form.name} onChange={handleChange} required />
+          <TextField label="Email" name="email" type="email" value={form.email} onChange={handleChange} required />
+          <TextField label="Message" name="message" multiline rows={4} value={form.message} onChange={handleChange} />
+          <Button type="submit" variant="contained">Send Inquiry</Button>
         </form>
-      )}
-    </div>
+      </Paper>
+    </Box>
   );
 }
