@@ -50,21 +50,20 @@ export default function PropertyList() {
   if (status === "failed") return <p>Error fetching properties.</p>;
 
   return (
-    <Box>
+    <Box sx={{ p: 3 }}>
       <Typography variant="h4" gutterBottom>
         Find Your Next Home
       </Typography>
 
       <Grid container spacing={3} alignItems="flex-start">
         {/* Sidebar Filters */}
-        <Grid item xs={12} md={3}>
+        <Grid size={3}>
           <Paper
             sx={{
               p: 3,
               position: { md: "sticky" },
               top: 90,
-              borderRadius: 2,
-              boxShadow: 3,
+              height: "100%",
             }}
           >
             <Typography variant="h6" gutterBottom>
@@ -121,7 +120,7 @@ export default function PropertyList() {
         </Grid>
 
         {/* Property Grid */}
-        <Grid item xs={12} md={9}>
+        <Grid size={9}>
           <Grid container spacing={3}>
             {items.map((p) => (
               <Grid item xs={12} sm={6} md={4} key={p._id}>
@@ -130,8 +129,6 @@ export default function PropertyList() {
                     display: "flex",
                     flexDirection: "column",
                     height: "100%",
-                    borderRadius: 2,
-                    boxShadow: 3,
                   }}
                 >
                   {p.images?.[0] && (
