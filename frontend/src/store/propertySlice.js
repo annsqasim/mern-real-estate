@@ -1,8 +1,11 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 
+const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
+
+
 export const fetchProperties = createAsyncThunk(
-  "properties/fetch",
+  `${API_URL}properties/fetch`,
   async ({ page = 1, limit = 6, type, location, minPrice, maxPrice }) => {
     const params = new URLSearchParams({ page, limit });
     if (type) params.append("type", type);
@@ -10,7 +13,7 @@ export const fetchProperties = createAsyncThunk(
     if (minPrice) params.append("minPrice", minPrice);
     if (maxPrice) params.append("maxPrice", maxPrice);
 
-    const res = await axios.get(`/api/properties?${params.toString()}`);
+    const res = await axios.get(`${API_URL}/api/properties?${params.toString()}`);
     return res.data;
   }
 );
@@ -18,7 +21,7 @@ export const fetchProperties = createAsyncThunk(
 export const createProperty = createAsyncThunk(
   "properties/create",
   async (payload) => {
-    const res = await axios.post("/api/properties", payload);
+    const res = await axios.post(`${API_URL}/api/properties`, payload);
     return res.data;
   }
 );
