@@ -1,9 +1,9 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
 import TestPage from "./pages/testpage";
-import PropertyList from "./pages/propertyList";
-import PropertyDetail from "./pages/propertydetail";
-import CreateProperty from "./pages/createproperty";
+import PropertyList from "./pages/PropertyList";
+import PropertyDetail from "./pages/PropertyDetail";
+import CreateProperty from "./pages/CreateProperty";
 import Dashboard from "./pages/Dashboard";
 import DashboardProperties from "./pages/DashboardProperties";
 import DashboardClients from "./pages/DashboardClients";
