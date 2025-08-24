@@ -50,7 +50,7 @@ export default function PropertyList() {
   if (status === "failed") return <p>Error fetching properties.</p>;
 
   return (
-    <Box sx={{ flexGrow: 1, p: 3 }}>
+    <Box>
       <Typography variant="h4" gutterBottom>
         Find Your Next Home
       </Typography>
